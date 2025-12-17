@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eatzy - Customer Dashboard</title>
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+
+    /* BACKGROUND IMAGE */
+    body {
+      min-height: 100vh;
+      background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url("/static/images/bg.png") no-repeat center center/cover;
+      display: flex;
+    }
+
+    body::before {
+      content: none;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 260px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      padding: 25px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      position: fixed;
+      height: 100vh;
+      box-shadow: 3px 0 12px rgba(0,0,0,0.2);
+      border-right: 1px solid rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    .logo img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      padding: 8px;
+      border: 2px solid rgba(255,255,255,0.25);
+    }
+
+    .sidebar a {
+      text-decoration: none;
+      color: white;
+      padding: 12px 15px;
+      display: block;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    .sidebar a:hover {
+      background: rgba(255,255,255,0.2);
+      color: #1e6ce6;
+      transform: translateX(5px);
+    }
+
+    /* MAIN CONTENT */
+    .main {
+      margin-left: 260px;
+      padding: 30px;
+      width: 100%;
+      color: white;
+    }
+
+    h2 {
+      margin-bottom: 25px;
+      font-size: 32px;
+      font-weight: 700;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    /* DASHBOARD CARDS */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.15);
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: 0.3s;
+      backdrop-filter: blur(10px);
+      color: white;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    }
+
+    .card-title {
+      font-size: 16px;
+      opacity: 0.9;
+      margin-bottom: 10px;
+    }
+
+    .card-value {
+      font-size: 34px;
+      font-weight: 700;
+    }
+
+    /* ORDER HISTORY TABLE */
+    .table-container {
+      background: rgba(255,255,255,0.15);
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      color: white;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      color: white;
+    }
+
+    table th, table td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      text-align: left;
+      font-size: 15px;
+    }
+
+    table th {
+      background: rgba(255,255,255,0.15);
+      border-radius: 8px;
+    }
+
+    /* MOBILE */
+    @media(max-width: 900px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+    }
+  </style>
+</head>
+
+<body>
+
+
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo">
+      <img src="/static/images/logo.png" alt="Eatzy Logo">
+    </div>
+    <a href="/customer/browse">Browse Restaurants</a>
+    <a href="/customer/orders">My Orders</a>
+    <a href="/customer/profile">Profile</a>
+    <a href="/logout">Logout</a>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <h2>Welcome Back 👋</h2>
+
+    <!-- CARDS -->
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">Total Orders</div>
+        <div class="card-value" id="totalOrders">0</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Active Orders</div>
+        <div class="card-value" id="activeOrders">0</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Money Spent</div>
+        <div class="card-value" id="moneySpent">₱0</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Favorite Restaurant</div>
+        <div class="card-value" id="favRestaurant">—</div>
+      </div>
+    </div>
+
+    <!-- ORDER HISTORY -->
+    <div class="table-container">
+      <h3 style="font-size:22px; margin-bottom:10px;">Recent Orders</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Restaurant</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+
+        <tbody id="recentOrders">
+          <tr><td colspan="5" style="text-align:center;padding:20px;color:#ddd;">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    async function loadDashboard() {
+      try {
+        const response = await fetch('/api/customer/dashboard');
+        const data = await response.json();
+
+        document.getElementById('totalOrders').textContent = data.total_orders;
+        document.getElementById('activeOrders').textContent = data.active_orders;
+        document.getElementById('moneySpent').textContent = '₱' + data.money_spent;
+        document.getElementById('favRestaurant').textContent = data.favorite_restaurant || '—';
+
+        const tbody = document.getElementById('recentOrders');
+        tbody.innerHTML = '';
+
+        data.recent_orders.forEach(order => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>#${order.id}</td>
+            <td>${order.restaurant}</td>
+            <td>₱${order.total}</td>
+            <td>${order.status}</td>
+            <td>${order.date}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+      } catch (err) {
+        console.error("Error loading dashboard:", err);
+      }
+    }
+
+    loadDashboard();
+  </script>
+
+</body>
+</html>

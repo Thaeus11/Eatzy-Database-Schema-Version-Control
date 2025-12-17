@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restaurant Orders - Eatzy</title>
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+  <style>
+    *{box-sizing:border-box;font-family:Poppins, sans-serif;margin:0;padding:0}
+    body{background:linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.4)),url("/static/images/bg.png") no-repeat center center/cover;min-height:100vh;padding:18px}
+    header{display:flex;justify-content:space-between;align-items:center;background:transparent;color:#fff;padding:14px;border-radius:8px}
+    .content{max-width:1100px;margin:18px auto}
+    .card{background:rgba(255,255,255,0.08);padding:16px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.12);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.18)}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{padding:12px;border-bottom:1px solid #eee;text-align:left;background:transparent;color:white;}
+    th{background:transparent;color:white;}
+    .empty{padding:28px;text-align:center;color:white}
+  </style>
+</head>
+<body>
+
+  <header style="display:flex;align-items:center;justify-content:space-between;background:transparent;color:#fff;padding:14px;border-radius:8px">
+    <div style="display:flex;align-items:center;">
+      <a href="/restaurant/dashboard" style="display:inline-flex;align-items:center;text-decoration:none;">
+        <img src="/static/images/logo.png" alt="Eatzy" style="width:60px;height:60px;object-fit:cover;border-radius:50%;background:rgba(255,255,255,0.12);box-shadow:0 2px 8px rgba(0,0,0,0.10);padding:6px;border:2px solid rgba(255,255,255,0.25);margin-right:18px;">
+      </a>
+      <div style="font-weight:700;font-size:1.5rem;">Orders</div>
+    </div>
+    <div>
+      <a href="/restaurant/dashboard" style="color:#fff;text-decoration:none;margin-right:12px">Dashboard</a>
+      <a href="/logout" style="color:#fff;text-decoration:none">Logout</a>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="card">
+      <h2 style="color:white;margin-bottom:8px">Recent Orders</h2>
+      <div id="ordersWrap">
+        <div class="empty">Loading orders...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function loadOrders(){
+      try{
+        const res = await fetch('/api/restaurant/orders');
+        if(!res.ok) throw new Error('Failed to fetch orders');
+        const orders = await res.json();
+        const wrap = document.getElementById('ordersWrap');
+        if(!orders || orders.length === 0){
+          wrap.innerHTML = '<div class="empty">No orders yet.</div>';
+          return;
+        }
+            let html = '<table><thead><tr><th>Order #</th><th>Customer</th><th>Total</th><th>Status</th><th>Date</th><th>Action</th></tr></thead><tbody>';
+            orders.forEach(o => {
+              const date = o.created_at ? new Date(o.created_at).toLocaleString() : '';
+              const orderId = o.id;
+              const status = o.status || 'Pending';
+              // status options
+              const options = ['Pending','Accepted','Preparing','Out for Delivery','Delivered','Completed','Cancelled'];
+              let selectHtml = '<select data-id="' + orderId + '" class="status-select">';
+              options.forEach(opt => {
+                const sel = (opt.toLowerCase() === (status||'').toLowerCase()) ? 'selected' : '';
+                selectHtml += `<option value="${opt}" ${sel}>${opt}</option>`;
+              });
+              selectHtml += '</select>';
+
+              html += `<tr>
+                <td>#${orderId}</td>
+                <td>${o.customer_name || o.customer || '—'}</td>
+                <td>₱${o.total}</td>
+                <td>${selectHtml}</td>
+                <td>${date}</td>
+                <td><button class="btn-update" data-id="${orderId}">Update</button></td>
+              </tr>`;
+            });
+            html += '</tbody></table>';
+            wrap.innerHTML = html;
+
+            // wire up update buttons
+            document.querySelectorAll('.btn-update').forEach(btn => {
+              btn.addEventListener('click', async (e) => {
+                const id = btn.getAttribute('data-id');
+                const sel = document.querySelector(`select[data-id="${id}"]`);
+                if (!sel) return;
+                const newStatus = sel.value;
+                btn.disabled = true;
+                btn.textContent = 'Updating...';
+                try {
+                  const resp = await fetch(`/api/orders/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                  });
+                  if (!resp.ok) {
+                    const err = await resp.json().catch(() => ({}));
+                    alert('Failed to update status: ' + (err.message || resp.statusText));
+                  } else {
+                    await loadOrders();
+                  }
+                } catch (err) {
+                  console.error('Update error', err);
+                  alert('Error updating order status');
+                } finally {
+                  btn.disabled = false;
+                  btn.textContent = 'Update';
+                }
+              });
+            });
+      }catch(err){
+        console.error('Error loading restaurant orders:', err);
+        document.getElementById('ordersWrap').innerHTML = '<div class="empty">Error loading orders.</div>';
+      }
+    }
+    loadOrders();
+  </script>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eatzy - Checkout</title>
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+    body { background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url("/static/images/bg.png") no-repeat center center/cover; min-height: 100vh; }
+
+    /* HEADER */
+    .header {
+      background: none; color: white;
+      padding: 18px 25px; display: flex; justify-content: space-between; align-items: center;
+      box-shadow: none;
+      position: sticky; top: 0; z-index: 100; backdrop-filter: none; border-bottom: none;
+    }
+    .header h1 { font-size: 26px; }
+    .header-nav { display: flex; gap: 20px; }
+    .header-nav a { color: white; text-decoration: none; font-weight: 500; transition: 0.2s; }
+    .header-nav a:hover { opacity: 0.8; }
+
+    /* MAIN CONTENT */
+    .container { max-width: 1000px; margin: 30px auto; padding: 20px; }
+
+    h2 { color: white; margin-bottom: 25px; font-size: 28px; }
+
+    /* LAYOUT */
+    .checkout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+
+    /* ORDER SUMMARY */
+    .order-summary {
+      background: rgba(255,255,255,0.1); border-radius: 15px; padding: 25px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .summary-title { color: #a8d8ff; font-size: 20px; margin-bottom: 20px; font-weight: 700; }
+
+    .summary-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .item-details { flex: 1; }
+    .item-name { font-weight: 600; color: white; }
+    .item-qty { color: rgba(255,255,255,0.7); font-size: 13px; }
+
+    .item-subtotal { color: #a8d8ff; font-weight: 700; }
+
+    .summary-total {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 15px 0; border-top: 2px solid #a8d8ff; margin-top: 15px;
+      font-size: 20px; font-weight: 700; color: #a8d8ff;
+    }
+
+    .empty-cart { text-align: center; color: rgba(255,255,255,0.7); padding: 30px; }
+    .empty-cart a { color: #a8d8ff; text-decoration: none; font-weight: 600; }
+
+    /* DELIVERY FORM */
+    .delivery-form {
+      background: rgba(255,255,255,0.1); border-radius: 15px; padding: 25px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; color: rgba(255,255,255,0.95); font-weight: 600; margin-bottom: 8px; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; padding: 12px; background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px;
+      font-family: "Poppins", sans-serif; font-size: 14px;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: rgba(255,255,255,0.6);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none; border-color: #a8d8ff; box-shadow: 0 0 0 3px rgba(168, 216, 255, 0.2);
+    }
+
+    .form-group textarea { resize: vertical; min-height: 80px; }
+
+    .payment-options { margin-bottom: 20px; }
+    .payment-option {
+      display: flex; align-items: center; padding: 12px; border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 8px; margin-bottom: 10px; cursor: pointer; transition: 0.2s;
+    }
+    .payment-option:hover { border-color: #a8d8ff; }
+    .payment-option input { margin-right: 12px; cursor: pointer; }
+    .payment-option label { flex: 1; cursor: pointer; font-weight: 500; color: rgba(255,255,255,0.95); }
+
+    .place-order-btn {
+      width: 100%; padding: 14px; background: rgba(255,255,255,0.15); color: white; border: 2px solid rgba(255,255,255,0.4); border-radius: 8px;
+      border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px;
+      transition: 0.2s; margin-top: 10px;
+    }
+
+    .place-order-btn:hover { background: #1556b8; }
+    .place-order-btn:disabled { background: rgba(255,255,255,0.2); cursor: not-allowed; }
+
+    .back-link { color: #7fd6ff; text-decoration: none; font-weight: 600; margin-bottom: 20px; display: inline-block; transition: color 0.2s; }
+    .back-link:hover { opacity: 0.8; }
+
+    @media(max-width: 768px) {
+      .checkout-grid { grid-template-columns: 1fr; }
+      .header { flex-wrap: wrap; gap: 10px; }
+      .header-nav { flex-direction: column; gap: 10px; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <div style="position:sticky;top:0;z-index:100;background:none;box-shadow:none;display:flex;align-items:center;padding:18px 25px;">
+    <a href="/dashboard" style="display: inline-flex; align-items: center; text-decoration: none;">
+      <img src="/static/images/logo.png" alt="Eatzy" style="width:150px;height:150px;object-fit:cover;border-radius:50%;background:rgba(255,255,255,0.12);box-shadow:0 2px 8px rgba(0,0,0,0.10);padding:8px;border:2px solid rgba(255,255,255,0.25);">
+    </a>
+  </div>
+  <div class="header-nav" style="display:flex;gap:20px;justify-content:flex-end;align-items:center;padding:18px 25px 0 25px;">
+    <a href="/customer/home">Back to Restaurants</a>
+    <a href="/customer/orders">My Orders</a>
+    <a href="/logout">Logout</a>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="container">
+    <a href="javascript:history.back()" class="back-link">← Back to Menu</a>
+    <h2>Checkout</h2>
+
+    <div class="checkout-grid">
+      <!-- ORDER SUMMARY -->
+      <div class="order-summary">
+        <div class="summary-title">Order Summary</div>
+        <div id="summaryItems">
+          <div class="empty-cart">
+            Your cart is empty. <a href="/customer/home">Browse restaurants</a>
+          </div>
+        </div>
+        <div class="summary-total" id="summaryTotal" style="display: none;">
+          <span>Total:</span>
+          <span>₱<span id="totalPrice">0</span></span>
+        </div>
+      </div>
+
+      <!-- DELIVERY FORM -->
+      <div class="delivery-form" id="deliveryForm" style="display: none;">
+        <div class="summary-title">Delivery Details</div>
+        
+        <form id="checkoutForm">
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" required>
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" required>
+          </div>
+
+          <div class="form-group">
+            <label for="address">Delivery Address</label>
+            <textarea id="address" name="address" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="specialInstructions">Special Instructions (Optional)</label>
+            <textarea id="specialInstructions" name="specialInstructions"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Payment Method</label>
+            <div class="payment-options">
+              <div class="payment-option">
+                <input type="radio" id="cod" name="paymentMethod" value="Cash on Delivery" checked>
+                <label for="cod">💰 Cash on Delivery</label>
+              </div>
+              <div class="payment-option">
+                <input type="radio" id="online" name="paymentMethod" value="Online Payment">
+                <label for="online">💳 Online Payment</label>
+              </div>
+            </div>
+            <div id="onlinePaymentOptions" style="display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);">
+              <label style="display: block; margin-bottom: 10px; color: rgba(255,255,255,0.95);">Select Payment Provider:</label>
+              <div class="payment-option">
+                <input type="radio" id="gcash" name="onlineProvider" value="GCash">
+                <label for="gcash" style="color: rgba(255,255,255,0.95);">📱 GCash</label>
+              </div>
+              <div class="payment-option">
+                <input type="radio" id="paymaya" name="onlineProvider" value="PayMaya" checked>
+                <label for="paymaya" style="color: rgba(255,255,255,0.95);">💳 PayMaya</label>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="place-order-btn">Place Order</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function loadCheckout() {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const restaurantId = localStorage.getItem('currentRestaurant') || '1';
+      
+      const summaryItems = document.getElementById('summaryItems');
+      const summaryTotal = document.getElementById('summaryTotal');
+      const deliveryForm = document.getElementById('deliveryForm');
+      const totalPrice = document.getElementById('totalPrice');
+
+      if (cart.length === 0) {
+        summaryItems.innerHTML = '<div class="empty-cart">Your cart is empty. <a href="/customer/home">Browse restaurants</a></div>';
+        summaryTotal.style.display = 'none';
+        deliveryForm.style.display = 'none';
+        return;
+      }
+
+      // Load customer profile data
+      try {
+        const profileRes = await fetch('/api/customer/profile');
+        const profile = await profileRes.json();
+        if (profile.name) document.getElementById('name').value = profile.name;
+        if (profile.phone) document.getElementById('phone').value = profile.phone;
+        if (profile.address) document.getElementById('address').value = profile.address;
+      } catch (error) {
+        console.error('Error loading profile:', error);
+      }
+
+      // Display cart items
+      let total = 0;
+      summaryItems.innerHTML = '';
+      
+      cart.forEach(item => {
+        total += item.price * item.quantity;
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'summary-item';
+        itemDiv.innerHTML = `
+          <div class="item-details">
+            <div class="item-name">${item.name}</div>
+            <div class="item-qty">Qty: ${item.quantity}</div>
+          </div>
+          <div class="item-subtotal">₱${(item.price * item.quantity).toFixed(2)}</div>
+        `;
+        summaryItems.appendChild(itemDiv);
+      });
+
+      totalPrice.textContent = total.toFixed(2);
+      summaryTotal.style.display = 'flex';
+      deliveryForm.style.display = 'block';
+
+      // Handle form submission
+      document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Get payment method
+        let paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+        
+        // If online payment, append provider
+        if (paymentMethod === 'Online Payment') {
+          const provider = document.querySelector('input[name="onlineProvider"]:checked').value;
+          paymentMethod = `Online Payment - ${provider}`;
+        }
+
+        // Calculate total
+        let total = 0;
+        cart.forEach(item => {
+          total += item.price * item.quantity;
+        });
+
+        const formData = {
+          restaurant_id: restaurantId,
+          delivery_address: document.getElementById('address').value,
+          payment_method: paymentMethod,
+          items: cart,
+          total: total,
+          special_instructions: document.getElementById('specialInstructions').value
+        };
+
+        console.log('Submitting order with restaurant_id:', restaurantId, 'Full data:', formData);
+
+        try {
+          const response = await fetch('/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+          });
+
+          const result = await response.json();
+          
+          if (result.status === 'success') {
+            alert(`Order placed successfully! Order #${result.order_number}`);
+            localStorage.removeItem('cart');
+            localStorage.removeItem('currentRestaurant');
+            window.location.href = '/customer/orders';
+          } else {
+            alert('Error placing order: ' + (result.message || 'Unknown error'));
+          }
+        } catch (error) {
+          console.error('Error placing order:', error);
+          alert('Error placing order. Please try again.');
+        }
+      });
+
+      // Show/hide online payment options
+      const paymentMethodRadios = document.querySelectorAll('input[name="paymentMethod"]');
+      const onlinePaymentOptions = document.getElementById('onlinePaymentOptions');
+      
+      paymentMethodRadios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+          if (e.target.value === 'Online Payment') {
+            onlinePaymentOptions.style.display = 'block';
+          } else {
+            onlinePaymentOptions.style.display = 'none';
+          }
+        });
+      });
+    }
+
+    // Load checkout on page load
+    loadCheckout();
+  </script>
+</body>
+</html>

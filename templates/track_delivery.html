@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eatzy - Track Delivery</title>
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+    body { background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url("/static/images/bg.png") no-repeat center center/cover; min-height: 100vh; }
+
+    /* HEADER */
+    .header {
+      background: transparent; color: white;
+      padding: 18px 25px; display: flex; justify-content: space-between; align-items: center;
+      box-shadow: none;
+      position: sticky; top: 0; z-index: 100; backdrop-filter: none; border-bottom: none;
+    }
+    .header h1 { font-size: 26px; }
+    .header-nav { display: flex; gap: 20px; }
+    .header-nav a { color: white; text-decoration: none; font-weight: 500; transition: 0.2s; }
+    .header-nav a:hover { opacity: 0.8; }
+
+    /* MAIN CONTENT */
+    .container { max-width: 900px; margin: 30px auto; padding: 20px; }
+
+    .back-link { color: #a8d8ff; text-decoration: none; font-weight: 600; margin-bottom: 20px; display: inline-block; }
+    .back-link:hover { opacity: 0.8; }
+
+    h2 { color: white; margin-bottom: 25px; font-size: 28px; }
+
+    /* TRACKING CONTAINER */
+    .tracking-card {
+      background: rgba(255,255,255,0.1); border-radius: 15px; padding: 30px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); margin-bottom: 30px;
+    }
+
+    .order-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-bottom: 20px; border-bottom: 2px solid rgba(255,255,255,0.2);
+      margin-bottom: 20px;
+    }
+
+    .order-number { font-size: 18px; font-weight: 700; color: #a8d8ff; }
+    .order-date { color: rgba(255,255,255,0.7); font-size: 14px; }
+
+    .order-status {
+      display: inline-block; padding: 8px 16px; border-radius: 20px; font-weight: 600;
+      font-size: 14px;
+    }
+
+    .status-pending { background: rgba(255,193,7,0.3); color: #ffeb3b; }
+    .status-preparing { background: rgba(0,188,212,0.3); color: #80deea; }
+    .status-out-for-delivery { background: rgba(33,150,243,0.3); color: #90caf9; }
+    .status-delivered { background: rgba(76,175,80,0.3); color: #81c784; }
+
+    /* PROGRESS TRACKER */
+    .progress-section {
+      margin-bottom: 30px;
+    }
+
+    .progress-title { font-size: 16px; font-weight: 700; color: white; margin-bottom: 20px; }
+
+    .progress-timeline {
+      position: relative;
+      padding: 0 0 0 40px;
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 25px;
+      padding-bottom: 25px;
+    }
+
+    .timeline-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .timeline-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: -30px;
+      top: 40px;
+      width: 3px;
+      height: calc(100% - 40px);
+      background: #ddd;
+    }
+
+    .timeline-item.completed:not(:last-child)::after {
+      background: #28a745;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -37px;
+      top: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ddd;
+      border: 3px solid white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .timeline-item.completed .timeline-dot {
+      background: #28a745;
+    }
+
+    .timeline-item.active .timeline-dot {
+      background: #1e6ce6;
+      box-shadow: 0 0 0 6px rgba(30, 108, 230, 0.2);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    .timeline-content { }
+    .timeline-label {
+      font-weight: 700; color: white; margin-bottom: 4px; font-size: 15px;
+    }
+    .timeline-time { color: white; font-size: 13px; }
+
+    /* ORDER DETAILS */
+    .details-section {
+      background: rgba(255,255,255,0.08); border-radius: 12px; padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .details-title { font-size: 16px; font-weight: 700; color: white; margin-bottom: 15px; }
+
+    .detail-row {
+      display: flex; justify-content: space-between; padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .detail-row:last-child { border-bottom: none; }
+
+    .detail-label { color: white; font-weight: 500; }
+    .detail-value { color: white; font-weight: 600; }
+
+    .items-list {
+      background: rgba(255,255,255,0.08); border-radius: 12px; padding: 20px;
+    }
+
+    .items-title { font-size: 16px; font-weight: 700; color: white; margin-bottom: 15px; }
+
+    .item-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid #eee;
+    }
+
+    .item-row:last-child { border-bottom: none; }
+
+    .item-info { flex: 1; }
+    .item-name { font-weight: 600; color: white; }
+    .item-qty { color: white; font-size: 13px; }
+
+    .item-price { color: white; font-weight: 700; }
+
+    .refresh-btn {
+      background: rgba(255,255,255,0.15);
+      color: white;
+      border: 2px solid rgba(255,255,255,0.4);
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.2s;
+      margin-top: 20px;
+    }
+
+    .refresh-btn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .empty-state {
+      text-align: center; padding: 50px 20px; color: white;
+    }
+
+    .empty-state h3 { color: white; margin-bottom: 10px; }
+
+    .loading { text-align: center; padding: 30px; color: white; }
+
+    .error { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+
+    @media(max-width: 768px) {
+      .header { flex-wrap: wrap; gap: 10px; }
+      .header-nav { flex-direction: column; gap: 10px; width: 100%; }
+      .order-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .detail-row { flex-direction: column; gap: 5px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <div class="header">
+    <a href="/dashboard" style="display: inline-flex; align-items: center; text-decoration: none;">
+      <img src="/static/images/logo.png" alt="Eatzy" style="width:150px;height:150px;object-fit:cover;border-radius:50%;background:rgba(255,255,255,0.12);box-shadow:0 2px 8px rgba(0,0,0,0.10);padding:8px;border:2px solid rgba(255,255,255,0.25);">
+    </a>
+    <div class="header-nav">
+      <a href="/customer/home">Back to Restaurants</a>
+      <a href="/customer/orders">My Orders</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="container">
+    <a href="/customer/orders" class="back-link">← Back to Orders</a>
+    <h2>Track Your Delivery</h2>
+
+    <div id="errorContainer"></div>
+    <div id="trackingContainer" class="loading">Loading order details...</div>
+  </div>
+
+  <script>
+    const orderId = new URLSearchParams(window.location.search).get('order_id');
+
+    async function loadTrackingInfo() {
+      if (!orderId) {
+        document.getElementById('trackingContainer').innerHTML = 
+          '<div class="empty-state"><h3>No order selected</h3><p><a href="/customer/orders" class="back-link">View your orders</a></p></div>';
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/orders/${orderId}`);
+        
+        if (!response.ok) {
+          throw new Error('Order not found');
+        }
+
+        const order = await response.json();
+
+        // Determine progress stages
+        const stages = ['Pending', 'Preparing', 'Out for Delivery', 'Delivered'];
+        const currentStageIndex = stages.indexOf(order.status || 'Pending');
+
+        // Build timeline HTML
+        let timelineHTML = '';
+        stages.forEach((stage, index) => {
+          const isCompleted = index < currentStageIndex;
+          const isActive = index === currentStageIndex;
+          const completedClass = isCompleted ? 'completed' : '';
+          const activeClass = isActive ? 'active' : '';
+
+          const stageIcons = {
+            'Pending': '📋',
+            'Preparing': '👨‍🍳',
+            'Out for Delivery': '🚚',
+            'Delivered': '✅'
+          };
+
+          const estimatedTime = getEstimatedTime(stage);
+
+          timelineHTML += `
+            <div class="timeline-item ${completedClass} ${activeClass}">
+              <div class="timeline-dot">${stageIcons[stage]}</div>
+              <div class="timeline-content">
+                <div class="timeline-label">${stage}</div>
+                <div class="timeline-time">${estimatedTime}</div>
+              </div>
+            </div>
+          `;
+        });
+
+        const statusClass = 'status-' + (order.status || 'pending').toLowerCase().replace(/ /g, '-');
+        const formattedDate = new Date(order.created_at).toLocaleDateString('en-US', {
+          year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+
+        let itemsHTML = '';
+        if (Array.isArray(order.items) && order.items.length > 0) {
+          order.items.forEach(item => {
+            itemsHTML += `
+              <div class="item-row">
+                <div class="item-info">
+                  <div class="item-name">${item.name}</div>
+                  <div class="item-qty">Quantity: ${item.quantity}</div>
+                </div>
+                <div class="item-price">₱${(item.price * item.quantity).toFixed(2)}</div>
+              </div>
+            `;
+          });
+        }
+
+        const trackingHTML = `
+          <div class="tracking-card">
+            <div class="order-header">
+              <div>
+                <div class="order-number">Order #${order.order_number}</div>
+                <div class="order-date">Ordered on ${formattedDate}</div>
+              </div>
+              <span class="order-status ${statusClass}">${order.status || 'Pending'}</span>
+            </div>
+
+            <div class="progress-section">
+              <div class="progress-title">Order Progress</div>
+              <div class="progress-timeline">
+                ${timelineHTML}
+              </div>
+            </div>
+
+            <div class="details-section">
+              <div class="details-title">📍 Delivery Details</div>
+              <div class="detail-row">
+                <span class="detail-label">Delivery Address</span>
+                <span class="detail-value">${order.delivery_address || 'N/A'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Payment Method</span>
+                <span class="detail-value">${order.payment_method || 'N/A'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Total Amount</span>
+                <span class="detail-value">₱${order.total || 0}</span>
+              </div>
+            </div>
+
+            <div class="items-list">
+              <div class="items-title">🛍️ Order Items</div>
+              ${itemsHTML}
+              <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #eee; font-weight: 700; color: white; text-align: right;">
+                Total: ₱${order.total || 0}
+              </div>
+            </div>
+
+            <button class="refresh-btn" onclick="location.reload()">🔄 Refresh Status</button>
+          </div>
+        `;
+
+        document.getElementById('trackingContainer').innerHTML = trackingHTML;
+
+        // Auto-refresh every 5 seconds
+        setInterval(() => {
+          loadTrackingInfo();
+        }, 5000);
+
+      } catch (error) {
+        console.error('Error loading order:', error);
+        document.getElementById('errorContainer').innerHTML = 
+          '<div class="error">Error loading order details. Please try again.</div>';
+        document.getElementById('trackingContainer').innerHTML = 
+          '<div class="empty-state"><p><a href="/customer/orders" class="back-link">Back to orders</a></p></div>';
+      }
+    }
+
+    function getEstimatedTime(stage) {
+      const now = new Date();
+      const times = {
+        'Pending': 'Just now',
+        'Preparing': 'In 15-20 minutes',
+        'Out for Delivery': 'In 30-45 minutes',
+        'Delivered': 'Completed'
+      };
+      return times[stage] || 'Pending';
+    }
+
+    // Load tracking info on page load
+    loadTrackingInfo();
+  </script>
+</body>
+</html>

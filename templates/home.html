@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eatzy - Food Delivery</title>
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+    body { background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url("/static/images/bg.png") no-repeat center center/cover; min-height: 100vh; }
+
+    /* HEADER */
+    .header {
+      background: transparent; color: white;
+      padding: 18px 25px; display: flex; justify-content: space-between; align-items: center;
+      box-shadow: none; backdrop-filter: none; border-bottom: none;
+    }
+    .header h1 { font-size: 28px; font-weight: 700; }
+    .header-nav a { margin-left: 20px; color: white; text-decoration: none; font-weight: 500; transition: 0.2s; }
+    .header-nav a:hover { opacity: 0.8; }
+
+    /* HERO SECTION */
+    .hero {
+      max-width: 1200px; margin: 50px auto; padding: 40px; text-align: center;
+      background: rgba(255,255,255,0.1); border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);
+    }
+    .hero h2 { font-size: 32px; color: white; margin-bottom: 15px; }
+    .hero p { font-size: 16px; color: rgba(255,255,255,0.9); margin-bottom: 30px; line-height: 1.6; }
+
+    .buttons { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      padding: 12px 30px; border: none; border-radius: 8px; cursor: pointer;
+      font-size: 16px; font-weight: 600; transition: 0.3s; text-decoration: none; display: inline-block;
+    }
+    .btn-primary {
+      background: rgba(255,255,255,0.2);
+      color: white !important;
+      border: 2px solid rgba(255,255,255,0.4);
+    }
+    .btn-primary:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    .btn-secondary { background: rgba(255,255,255,0.2); color: white !important; border: 2px solid rgba(255,255,255,0.4); }
+    .btn-secondary:hover { background: rgba(255,255,255,0.3); }
+
+    /* FEATURES */
+    .features {
+      max-width: 1200px; margin: 50px auto; padding: 40px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;
+    }
+    .feature-card {
+      background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px;
+      text-align: center; box-shadow: 0 4px 18px rgba(0,0,0,0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);
+      transition: 0.3s; color: white;
+    }
+    .feature-card:hover { transform: translateY(-10px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+    .feature-card h3 { color: #a8d8ff; margin-bottom: 12px; }
+    .feature-card p { color: rgba(255,255,255,0.9); line-height: 1.6; }
+
+    /* FOOTER */
+    footer { background: transparent; color: white; padding: 30px; text-align: center; margin-top: 50px; backdrop-filter: none; border-top: none; }
+
+    @media(max-width: 720px) {
+      .header { flex-direction: column; gap: 10px; }
+      .hero { margin: 30px 20px; padding: 20px; }
+      .buttons { flex-direction: column; }
+      .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <div class="header">
+    <div style="display:flex;align-items:center;">
+      <a href="/" style="display:inline-flex;align-items:center;text-decoration:none;">
+        <img src="/static/images/logo.png" alt="Eatzy" style="width:60px;height:60px;object-fit:cover;border-radius:50%;background:rgba(255,255,255,0.12);box-shadow:0 2px 8px rgba(0,0,0,0.10);padding:6px;border:2px solid rgba(255,255,255,0.25);margin-right:18px;">
+      </a>
+      <h1 style="margin:0;">Eatzy</h1>
+    </div>
+    <div class="header-nav">
+      <a href="#features">Features</a>
+      <a href="/customer/login">Customer Login</a>
+      <a href="/restaurant/login">Restaurant Login</a>
+    </div>
+  </div>
+
+  <!-- MAIN GLASS CONTAINER -->
+  <div class="main-glass" style="max-width: 900px; margin: 60px auto 0 auto; padding: 40px 32px; background: rgba(255,255,255,0.13); border-radius: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.25); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.18); text-align: center;">
+    <h2 style="font-size: 2.2rem; color: white; margin-bottom: 18px; text-shadow: 0 2px 6px rgba(0,0,0,0.4);">Welcome to Eatzy</h2>
+    <p style="font-size: 1.1rem; color: rgba(255,255,255,0.92); margin-bottom: 32px;">Connecting you with local restaurants and fast-food chains in your area. Browse menus, place orders, and track your deliveries online.</p>
+    <div class="buttons" style="margin-bottom: 32px;">
+      <a href="/customer/login" class="btn btn-primary">Order Food</a>
+      <a href="/restaurant/login" class="btn btn-secondary">Partner with Us</a>
+    </div>
+    <div id="features">
+      <h2 style="text-align: center; color: #a8d8ff; margin-bottom: 32px; font-size: 1.6rem;">Why Choose Eatzy?</h2>
+      <div class="features">
+        <div class="feature-card">
+          <h3>🛒 Easy Ordering</h3>
+          <p>Browse menus from local restaurants and place orders with just a few clicks.</p>
+        </div>
+        <div class="feature-card">
+          <h3>📍 Live Tracking</h3>
+          <p>Track your delivery in real-time and get live status updates on your order.</p>
+        </div>
+        <div class="feature-card">
+          <h3>💳 Flexible Payments</h3>
+          <p>Choose between cash on delivery or secure online payment options.</p>
+        </div>
+        <div class="feature-card">
+          <h3>🏪 Local Support</h3>
+          <p>Support local businesses and help them reach more customers.</p>
+        </div>
+        <div class="feature-card">
+          <h3>⭐ Quality Service</h3>
+          <p>Fast delivery, quality food, and excellent customer service guaranteed.</p>
+        </div>
+        <div class="feature-card">
+          <h3>📊 Business Tools</h3>
+          <p>Restaurants get a digital platform to manage orders and grow their business.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2025 Eatzy - Connecting Communities Through Food | Supporting SDG 8 & 9</p>
+  </footer>
+</body>
+</html>

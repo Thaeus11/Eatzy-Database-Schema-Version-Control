@@ -1,0 +1,38 @@
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url("/static/images/bg.png") no-repeat center center/cover;
+    min-height: 100vh;
+    text-align: center;
+    padding-top: 40px;
+}
+
+h1 {
+    color: #ff5b5b;
+}
+
+/* Header / logo styling */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 25px;
+    background: transparent;
+    color: white;
+    box-shadow: none;
+    backdrop-filter: none;
+    border-bottom: none;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.brand { display: inline-flex; align-items: center; text-decoration: none; }
+.site-logo { height: 56px; width: auto; display: block; }
+
+.nav { display: flex; gap: 16px; align-items: center; }
+.nav a { text-decoration: none; color: white !important; font-weight: 600; }
+
+@media (max-width: 600px) {
+    .site-logo { height: 40px; }
+    .nav { gap: 8px; }
+}

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eatzy - Customer Login</title>
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+    body { background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url("/static/images/bg.png") no-repeat center center/cover; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    h1, .subtitle, label, .link, .link a, .error, input, .btn {
+      color: white !important;
+    }
+    .subtitle { color: rgba(255,255,255,0.9) !important; }
+    label { color: rgba(255,255,255,0.95) !important; }
+    input { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); }
+    input::placeholder { color: rgba(255,255,255,0.6); }
+    .error { color: #ff9999; }
+    .link { color: rgba(255,255,255,0.9); }
+    .link a { color: #a8d8ff; }
+
+    .container { background: rgba(255, 255, 255, 0.1); padding: 40px; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.2); max-width: 400px; width: 90%; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); }
+    h1 { margin-bottom: 10px; text-align: center; }
+    .subtitle { text-align: center; margin-bottom: 30px; }
+
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
+    input { width: 100%; padding: 12px; border: 1px solid #bcd0ff; border-radius: 8px; font-size: 14px; transition: 0.2s; }
+    input:focus { outline: none; border-color: #a8d8ff; box-shadow: 0 0 6px rgba(168,216,255,0.25); }
+
+    .btn { width: 100%; padding: 12px; background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.4); border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+    .btn:hover { background: rgba(255,255,255,0.3); }
+
+    .link { text-align: center; margin-top: 20px; font-size: 14px; }
+    .link a { color: #a8d8ff; text-decoration: none; font-weight: 600; }
+    .link a:hover { text-decoration: underline; }
+
+    .back-link {
+      display: inline-block;
+      position: absolute;
+      top: 32px;
+      left: 32px;
+      color: #a8d8ff;
+      text-decoration: none;
+      font-weight: 600;
+      background: rgba(0,0,0,0.2);
+      padding: 8px 18px;
+      border-radius: 8px;
+      z-index: 10;
+    }
+    .back-link:hover { text-decoration: underline; background: rgba(0,0,0,0.35); }
+
+    .logo-center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .error { color: #ff9999; font-size: 14px; margin-top: 5px; display: none; }
+  </style>
+</head>
+<body>
+  <a href="/" class="back-link">← Back Home</a>
+  <div class="container">
+    <div class="logo-center">
+      <a href="/customer/home" style="display: inline-flex; align-items: center; text-decoration: none;">
+        <img src="/static/images/logo.png" alt="Eatzy" style="width:150px;height:150px;object-fit:cover;border-radius:50%;background:rgba(255,255,255,0.12);box-shadow:0 2px 8px rgba(0,0,0,0.10);padding:8px;border:2px solid rgba(255,255,255,0.25);">
+      </a>
+    </div>
+    <p class="subtitle">Customer Login</p>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required placeholder="your@email.com">
+        <div class="error" id="emailError"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required placeholder="Enter your password">
+        <div class="error" id="passwordError"></div>
+      </div>
+
+      <button type="submit" class="btn">Login</button>
+      <div class="error" id="generalError"></div>
+    </form>
+
+    <div class="link">
+      Don't have an account? <a href="/customer/register">Register here</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      try {
+        const response = await fetch('/customer/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+          window.location.href = '/customer/home';
+        } else {
+          document.getElementById('generalError').textContent = data.message;
+          document.getElementById('generalError').style.display = 'block';
+        }
+      } catch (error) {
+        document.getElementById('generalError').textContent = 'Login failed. Please try again.';
+        document.getElementById('generalError').style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
